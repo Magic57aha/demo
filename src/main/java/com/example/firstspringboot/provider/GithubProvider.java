@@ -36,7 +36,7 @@ public class GithubProvider {
 
     public GithubUser getUser(String accessToken) {
         // 替换为你的GitHub访问令牌
-        String token = "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";
+        String token = "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";
 
         // GitHub API请求URL
         String apiUrl = "https://api.github.com/user";
