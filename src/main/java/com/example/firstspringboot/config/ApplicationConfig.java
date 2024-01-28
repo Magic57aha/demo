@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 /**
  * @author code羊
  * @date 2024/1/20 16 49
- * discription
+ * discription 数据库配置
  */
 @Configuration
 @MapperScan("com.example.firstspringboot.mapper") // 指定Mapper接口的扫描路径
