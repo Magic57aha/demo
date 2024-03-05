@@ -1,5 +1,8 @@
 package com.example.firstspringboot.servingwebcontent;
 
+import com.example.firstspringboot.Service.QuestionService;
+import com.example.firstspringboot.dto.PaginationDTO;
+import com.example.firstspringboot.dto.QuestionDTO;
 import com.example.firstspringboot.mapper.UserMapper;
 import com.example.firstspringboot.model.User;
 import jakarta.servlet.http.Cookie;
@@ -7,7 +10,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author code羊
@@ -17,21 +25,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class IndexController {
     @Autowired
-    private UserMapper userMapper;
+    private QuestionService questionService;
+
     @GetMapping("/")
-    public String index(HttpServletRequest request){
-        // 获取cookies
-        Cookie[] cookies = request.getCookies();
-        // 查询cookies中的token在数据库中是否存在，存在则写入Session（页面的显示状态是根据Session中的user.name是否存在判断的）
-        for (Cookie cookie : cookies) {
-            if(cookie.getName().equals("token")){
-                String token = cookie.getValue();
-                User user = userMapper.findByToken(token);
-                if (user != null){
-                    request.getSession().setAttribute("user",user);
-                }
-            }
-        }
+    public String index(Model model,
+                        @RequestParam(name = "page", defaultValue = "1") Integer page,
+                        @RequestParam(name = "size", defaultValue = "2") Integer size){
+
+        // 从数据库中获取问题信息
+        PaginationDTO paginationDTO = questionService.list(page, size);
+        model.addAttribute("pagination",paginationDTO);
+
         return "index";
     }
 }

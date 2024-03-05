@@ -1,12 +1,12 @@
 package com.example.firstspringboot.servingwebcontent;
 
+import com.example.firstspringboot.Service.UserService;
 import com.example.firstspringboot.dto.AccessTokenDTO;
 import com.example.firstspringboot.dto.GithubUser;
 import com.example.firstspringboot.mapper.UserMapper;
 import com.example.firstspringboot.model.User;
 import com.example.firstspringboot.provider.GithubProvider;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class AuthorizeController {
     private String clientUir;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
                            @RequestParam(name = "state") String state,
@@ -49,15 +49,14 @@ public class AuthorizeController {
         System.out.println(githubUser.getBio() + githubUser.getLogin() + githubUser.getId());
 
         if(githubUser != null){
-            // 将返回的用户结果插入数据库
+            // 将返回的用户结果写入数据库
             User user = new User();
             String token = UUID.randomUUID().toString();
             user.setToken(token);
             user.setName((githubUser.getLogin()));
             user.setAccountId(String.valueOf(githubUser.getId()));
-            user.setGmtCreate(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtCreate());
-            userMapper.insert(user);
+            user.setAvatarUrl(githubUser.getAvatarUrl());
+            userService.creatOrUpdate(user);
             // 登录成功，写cookie
             response.addCookie(new Cookie("token", token));
             // 回到首页
@@ -68,4 +67,14 @@ public class AuthorizeController {
         }
 
     }
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request,
+                         HttpServletResponse response){
+        request.getSession().removeAttribute("user");
+        Cookie cookie = new Cookie("token", null);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        return "redirect:/";
+    }
+
 }

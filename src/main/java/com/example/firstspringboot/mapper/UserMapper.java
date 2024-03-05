@@ -1,9 +1,6 @@
 package com.example.firstspringboot.mapper;
 import com.example.firstspringboot.model.User;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 /**
  * @author code羊
@@ -12,8 +9,15 @@ import org.apache.ibatis.annotations.Select;
  */
 @Mapper
 public interface UserMapper {
-    @Insert("insert into USERTABLE (name,account_Id,token,gmt_create,gmt_modified) values (#{name},#{accountId},#{token},#{gmtCreate},#{gmtModified})")
+    @Insert("insert into USERTABLE (name,account_Id,token,gmt_create,gmt_modified,avatar_url) values (#{name},#{accountId},#{token},#{gmtCreate},#{gmtModified},#{avatarUrl})")
     void insert(User user);
     @Select("select * from USERTABLE where token = #{token}")
     User findByToken(@Param("token") String token);
+
+    @Select("select * from USERTABLE where id = #{id}")
+    User findByID(@Param("id") Integer id);
+    @Select("select * from USERTABLE where account_id = #{accountId}")
+    User findByAccountId(@Param("accountId") String accountId);
+    @Update("update usertable set name = #{name}, token = #{token}, gmt_modified = #{gmtModified}, avatar_url = #{avatarUrl} where id =#{id}")
+    void update(User user);
 }
